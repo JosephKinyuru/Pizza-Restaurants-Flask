@@ -11,6 +11,7 @@ Pizza-Restaurants is a API project that focuses on restful API and its applicati
 -  The restful API is based on JSON format so all `POST` requests should be in JSON and the responses will also be in JSON.
 -  If you post data into the database then run `seed.py` the data will be deleted. Its better to post after running seed.py so that you can view your data.
 - The seed data is mainly for helping to visualize the `GET` responses.
+- There are more HTTP requests which can be sent in the API . Explore them within the resources in the app.py file
 
 
 # Author
@@ -22,6 +23,10 @@ Joseph Kinyuru
 # Project setup
 - Python
 - Flask
+- Flask-migrate
+- Flask-restful
+- Flask-marshmallow
+- Flask-sqlalchemy
 
 # Lisence
 MIT License
