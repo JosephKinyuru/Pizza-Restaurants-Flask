@@ -7,7 +7,7 @@ from werkzeug.exceptions import NotFound
 from models import db, Pizza , RestaurantPizza , Restaurant
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pizza_restauran.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pizza_restaurant.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json.compact = False
 
@@ -73,8 +73,8 @@ class Restaurants(Resource):
     def post(self):
 
         new_restaurant = Restaurant(
-            name=request.form['name'],
-            address=request.form['address'],
+            name=request.json['name'],
+            address=request.json['address'],
         )
 
         db.session.add(new_restaurant)
@@ -116,7 +116,7 @@ class RestaurantByID(Resource):
 
         if restaurant :
             for attr in request.form:
-                setattr(restaurant, attr, request.form[attr])
+                setattr(restaurant, attr, request.json[attr])
 
             db.session.add(restaurant)
             db.session.commit()
@@ -177,8 +177,8 @@ class Pizzas(Resource):
     def post(self):
 
         new_pizza = Pizza(
-            name=request.form['name'],
-            ingredients=request.form['ingedients'],
+            name=request.json['name'],
+            ingredients=request.json['ingedients'],
         )
 
         db.session.add(new_pizza)
@@ -197,15 +197,15 @@ class RestaurantPizzas(Resource):
 
     def post(self):
 
-        restaurant = Restaurant.query.filter_by(id=request.form['restaurant_id']).first()
-        pizza = Restaurant.query.filter_by(id=request.form['pizza_id']).first()
+        restaurant = Restaurant.query.filter_by(id=request.json['restaurant_id']).first()
+        pizza = Restaurant.query.filter_by(id=request.json['pizza_id']).first()
 
         if restaurant and pizza :
 
             new_restaurant_pizza = RestaurantPizza(
-                price=request.form['price'],
-                pizza_id=request.form['pizza_id'],
-                restaurant_id=request.form['restaurant_id'],
+                price=request.json['price'],
+                pizza_id=request.json['pizza_id'],
+                restaurant_id=request.json['restaurant_id'],
             )
 
             db.session.add(new_restaurant_pizza)
