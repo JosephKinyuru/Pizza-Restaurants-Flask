@@ -2,8 +2,9 @@ from flask import Flask, jsonify, request, make_response
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
+from werkzeug.exceptions import NotFound
 
-from models import db, Pizza , Restaurant_Pizza , Restaurant
+from models import db, Pizza , RestaurantPizza , Restaurant
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pizza_restauran.db'
@@ -15,27 +16,27 @@ db.init_app(app)
 
 ma = Marshmallow(app)
 
-class PizzaSchema(ma.SQLAlchemySchema):
+class RestaurantSchema(ma.SQLAlchemyAutoSchema):
 
     class Meta:
-        model = Pizza
+        model = Restaurant
         load_instance = True
 
-    title = ma.auto_field()
-    published_at = ma.auto_field()
+restaurant_schema = RestaurantSchema()
+restaurants_schema = RestaurantSchema(many=True)
 
+class PizzaSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Pizza
 
-    url = ma.Hyperlinks(
-        {
-            "self": ma.URLFor(
-                "pizzabyid",
-                values=dict(id="<id>")),
-            "collection": ma.URLFor("pizzas"),
-        }
-    )
+pizza_schema = PizzaSchema()
+pizzas_schema = PizzaSchema(many=True)
 
-newsletter_schema = PizzaSchema()
-newsletters_schema = PizzaSchema(many=True)
+class RestaurantPizzaSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = RestaurantPizza
+
+restaurant_pizza_schema = RestaurantPizzaSchema()
 
 api = Api(app)
 
@@ -55,3 +56,188 @@ class Index(Resource):
         return response
 
 api.add_resource(Index, '/')
+
+class Restaurants(Resource):
+
+    def get(self):
+
+        restaurants = Restaurant.query.all()
+
+        response = make_response(
+            restaurants_schema.dump(restaurants),
+            200,
+        )
+
+        return response
+
+    def post(self):
+
+        new_restaurant = Restaurant(
+            name=request.form['name'],
+            address=request.form['address'],
+        )
+
+        db.session.add(new_restaurant)
+        db.session.commit()
+
+        response = make_response(
+            restaurant_schema.dump(new_restaurant),
+            201,
+        )
+
+        return response
+
+api.add_resource(Restaurants, '/restaurants')
+
+class RestaurantByID(Resource):
+
+    def get(self, id):
+
+        restaurant = Restaurant.query.filter_by(id=id).first()
+
+        if restaurant :
+            response = make_response(
+                restaurant_schema.dump(restaurant),
+                200,
+            )
+
+            return response
+        
+        else :
+            response = make_response(
+                "error: Restaurant not found",
+                  404
+                )
+            return response
+
+    def patch(self, id):
+
+        restaurant = Restaurant.query.filter_by(id=id).first()
+
+        if restaurant :
+            for attr in request.form:
+                setattr(restaurant, attr, request.form[attr])
+
+            db.session.add(restaurant)
+            db.session.commit()
+
+            response = make_response(
+                restaurant_schema.dump(restaurant),
+                200
+            )
+
+            return response
+
+        
+        else :
+            response = make_response(
+                "error: Restaurant not found",
+                404
+            )
+            return response
+
+    def delete(self, id):
+
+        restaurant = Restaurant.query.filter_by(id=id).first()
+
+        if restaurant :
+            db.session.delete(restaurant)
+            db.session.commit()
+
+            response_dict = {"message": "restaurant successfully deleted"}
+
+            response = make_response(
+                jsonify(response_dict),
+                200
+            )
+
+            return response
+        else :
+            response = make_response(
+                "error: Restaurant not found",
+                  404
+                )
+            return response
+
+api.add_resource(RestaurantByID, '/restaurants/<int:id>')
+
+class Pizzas(Resource):
+
+    def get(self):
+
+        pizzas = Pizza.query.all()
+
+        response = make_response(
+            pizzas_schema.dump(pizzas),
+            200,
+        )
+
+        return response
+
+    def post(self):
+
+        new_pizza = Pizza(
+            name=request.form['name'],
+            ingredients=request.form['ingedients'],
+        )
+
+        db.session.add(new_pizza)
+        db.session.commit()
+
+        response = make_response(
+            pizza_schema.dump(new_pizza),
+            201,
+        )
+
+        return response
+
+api.add_resource(Pizzas, '/pizzas')
+
+class RestaurantPizzas(Resource):
+
+    def post(self):
+
+        restaurant = Restaurant.query.filter_by(id=request.form['restaurant_id']).first()
+        pizza = Restaurant.query.filter_by(id=request.form['pizza_id']).first()
+
+        if restaurant and pizza :
+
+            new_restaurant_pizza = RestaurantPizza(
+                price=request.form['price'],
+                pizza_id=request.form['pizza_id'],
+                restaurant_id=request.form['restaurant_id'],
+            )
+
+            db.session.add(new_restaurant_pizza)
+            db.session.commit()
+
+            response = make_response(
+                restaurant_pizza_schema.dump(new_restaurant_pizza),
+                201,
+            )
+
+            return response
+        
+        else :
+            response = make_response(
+                  {"errors": ["validation errors"]},
+                  400
+            )
+
+            return response
+    
+api.add_resource(RestaurantPizzas, '/restaurant_pizzas')
+
+
+@app.errorhandler(NotFound)
+def handle_not_found(e):
+
+    response = make_response(
+        "Not Found: The requested resource does not exist.",
+        404
+    )
+
+    return response
+
+if __name__ == '__main__':
+    app.run(port=5555)
