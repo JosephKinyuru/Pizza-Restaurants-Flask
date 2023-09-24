@@ -52,6 +52,7 @@ class Index(Resource):
             jsonify(response_dict),
             200,
         )
+        response.headers["Content-Type"] = "application/json"
 
         return response
 
@@ -68,6 +69,7 @@ class Restaurants(Resource):
                 restaurants_schema.dump(restaurants),
                 200,
             )
+            response.headers["Content-Type"] = "application/json"
 
             return response
         
@@ -76,6 +78,8 @@ class Restaurants(Resource):
                 jsonify({"error":" Restaurants are not currently in database"}),
                   404
                 )
+            response.headers["Content-Type"] = "application/json"
+
             return response
 
     def post(self):
@@ -92,6 +96,7 @@ class Restaurants(Resource):
             restaurant_schema.dump(new_restaurant),
             201,
         )
+        response.headers["Content-Type"] = "application/json"
 
         return response
 
@@ -108,6 +113,7 @@ class RestaurantByID(Resource):
                 restaurant_schema.dump(restaurant),
                 200,
             )
+            response.headers["Content-Type"] = "application/json"
 
             return response
         
@@ -116,6 +122,8 @@ class RestaurantByID(Resource):
                 jsonify({"error":" Restaurant not found"}),
                   404
                 )
+            response.headers["Content-Type"] = "application/json"
+
             return response
 
     def patch(self, id):
@@ -133,6 +141,7 @@ class RestaurantByID(Resource):
                 restaurant_schema.dump(restaurant),
                 200
             )
+            response.headers["Content-Type"] = "application/json"
 
             return response
 
@@ -142,6 +151,8 @@ class RestaurantByID(Resource):
                 jsonify({"error": "Restaurant not found"}),
                 404
             )
+            response.headers["Content-Type"] = "application/json"
+
             return response
 
     def delete(self, id):
@@ -158,6 +169,7 @@ class RestaurantByID(Resource):
                 jsonify(response_dict),
                 200
             )
+            response.headers["Content-Type"] = "application/json"
 
             return response
         else :
@@ -165,6 +177,8 @@ class RestaurantByID(Resource):
                 jsonify({"error": "Restaurant not found"}),
                 404
                 )
+            response.headers["Content-Type"] = "application/json"
+
             return response
 
 api.add_resource(RestaurantByID, '/restaurants/<int:id>')
@@ -180,7 +194,8 @@ class Pizzas(Resource):
                 pizzas_schema.dump(pizzas),
                 200,
             )
-
+            response.headers["Content-Type"] = "application/json"
+            
             return response
         
         else :
@@ -188,6 +203,7 @@ class Pizzas(Resource):
                 jsonify({"error":" Pizzas are not currently in database"}),
                   404
                 )
+            response.headers["Content-Type"] = "application/json"
             return response
 
     def post(self):
@@ -204,6 +220,7 @@ class Pizzas(Resource):
             pizza_schema.dump(new_pizza),
             201,
         )
+        response.headers["Content-Type"] = "application/json"
 
         return response
 
@@ -231,6 +248,7 @@ class RestaurantPizzas(Resource):
                 restaurant_pizza_schema.dump(new_restaurant_pizza),
                 201,
             )
+            response.headers["Content-Type"] = "application/json"
 
             return response
         
@@ -239,6 +257,7 @@ class RestaurantPizzas(Resource):
                   jsonify({"errors": ["validation errors"]}),
                   400
             )
+            response.headers["Content-Type"] = "application/json"
 
             return response
     
@@ -249,9 +268,10 @@ api.add_resource(RestaurantPizzas, '/restaurant_pizzas')
 def handle_not_found(e):
 
     response = make_response(
-        "Not Found: The requested resource does not exist.",
+        jsonify({"Not Found": "The requested resource does not exist."}),
         404
     )
+    response.headers["Content-Type"] = "application/json"
 
     return response
 
