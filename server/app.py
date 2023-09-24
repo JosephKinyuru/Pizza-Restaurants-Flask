@@ -63,12 +63,20 @@ class Restaurants(Resource):
 
         restaurants = Restaurant.query.all()
 
-        response = make_response(
-            restaurants_schema.dump(restaurants),
-            200,
-        )
+        if restaurants :
+            response = make_response(
+                restaurants_schema.dump(restaurants),
+                200,
+            )
 
-        return response
+            return response
+        
+        else :
+            response = make_response(
+                jsonify({"error":" Restaurants are not currently in database"}),
+                  404
+                )
+            return response
 
     def post(self):
 
@@ -105,7 +113,7 @@ class RestaurantByID(Resource):
         
         else :
             response = make_response(
-                "error: Restaurant not found",
+                jsonify({"error":" Restaurant not found"}),
                   404
                 )
             return response
@@ -131,7 +139,7 @@ class RestaurantByID(Resource):
         
         else :
             response = make_response(
-                "error: Restaurant not found",
+                jsonify({"error": "Restaurant not found"}),
                 404
             )
             return response
@@ -154,8 +162,8 @@ class RestaurantByID(Resource):
             return response
         else :
             response = make_response(
-                "error: Restaurant not found",
-                  404
+                jsonify({"error": "Restaurant not found"}),
+                404
                 )
             return response
 
@@ -167,12 +175,20 @@ class Pizzas(Resource):
 
         pizzas = Pizza.query.all()
 
-        response = make_response(
-            pizzas_schema.dump(pizzas),
-            200,
-        )
+        if pizzas :
+            response = make_response(
+                pizzas_schema.dump(pizzas),
+                200,
+            )
 
-        return response
+            return response
+        
+        else :
+            response = make_response(
+                jsonify({"error":" Pizzas are not currently in database"}),
+                  404
+                )
+            return response
 
     def post(self):
 
@@ -220,7 +236,7 @@ class RestaurantPizzas(Resource):
         
         else :
             response = make_response(
-                  {"errors": ["validation errors"]},
+                  jsonify({"errors": ["validation errors"]}),
                   400
             )
 
