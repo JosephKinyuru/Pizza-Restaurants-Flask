@@ -1,12 +1,23 @@
 # Project Description
+Pizza-Restaurants is a API project that focuses on restful API and its applications on a local scale. Because its mostly based on your local machine its best used on postman especially for `POST` requests but for `GET` requests it can also work on browsers.
 
 # How to launch project
+- Cd into server directory `cd server`
+- Seed the database `python3 seed.py`   (Optional)
+- Run the application `flask run` or `python3 app.py`
+- Open the provided link in postman or on browser
+
+**Note** 
+-  The restful API is based on JSON format so all `POST` requests should be in JSON and the responses will also be in JSON.
+-  If you post data into the database then run `seed.py` the data will be deleted. Its better to post after running seed.py so that you can view your data.
+- The seed data is mainly for helping to visualize the `GET` responses.
+
 
 # Author
 Joseph Kinyuru
 
 # Title
-# Cooking Confessions
+# Pizza-Restaurants
 
 # Project setup
 - Python
@@ -29,9 +40,6 @@ THE SOFTWARE IS PROVIDED "AS IS," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 # Want to use some of the code ?
 Feel free to use the code as long as you follow the lisence and copywrite agreement.
-
-## Developer Notes
-
 
 ## Like the code ?
 * Feel free to send money yo my paypal the email is josephkinyuru22@gmail.com 
