@@ -109,15 +109,22 @@ class RestaurantByID(Resource):
         restaurant = Restaurant.query.filter_by(id=id).first()
 
         if restaurant :
-            restaurant_data = restaurant_schema.dump(restaurant)
-            
-            pizzas = Pizza.query.filter_by(restaurant_id=id).all()
-            pizza_data = pizzas_schema.dump(pizzas)
-            
+            restaurant_pizzas = RestaurantPizza.query.filter_by(restaurant_id=id).all()
+            pizza_data = []
+
+            for rp in restaurant_pizzas:
+                pizza = Pizza.query.get(rp.pizza_id)
+                if pizza:
+                    pizza_data.append({
+                        "id": pizza.id,
+                        "name": pizza.name,
+                        "ingredients": pizza.ingredients
+                    })
+
             response_data = {
-                "id": restaurant_data["id"],
-                "name": restaurant_data["name"],
-                "address": restaurant_data["address"],
+                "id": restaurant.id,
+                "name": restaurant.name,
+                "address": restaurant.address,
                 "pizzas": pizza_data
             }
 
