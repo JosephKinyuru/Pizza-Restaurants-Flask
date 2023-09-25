@@ -109,8 +109,20 @@ class RestaurantByID(Resource):
         restaurant = Restaurant.query.filter_by(id=id).first()
 
         if restaurant :
+            restaurant_data = restaurant_schema.dump(restaurant)
+            
+            pizzas = Pizza.query.filter_by(restaurant_id=id).all()
+            pizza_data = pizzas_schema.dump(pizzas)
+            
+            response_data = {
+                "id": restaurant_data["id"],
+                "name": restaurant_data["name"],
+                "address": restaurant_data["address"],
+                "pizzas": pizza_data
+            }
+
             response = make_response(
-                restaurant_schema.dump(restaurant),
+                jsonify(response_data),
                 200,
             )
             response.headers["Content-Type"] = "application/json"
