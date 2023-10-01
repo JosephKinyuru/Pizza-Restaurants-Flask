@@ -250,7 +250,7 @@ class RestaurantPizzas(Resource):
     def post(self):
 
         restaurant = Restaurant.query.filter_by(id=request.json['restaurant_id']).first()
-        pizza = Restaurant.query.filter_by(id=request.json['pizza_id']).first()
+        pizza = Pizza.query.filter_by(id=request.json['pizza_id']).first()
 
         if restaurant and pizza :
 
