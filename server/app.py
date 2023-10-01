@@ -264,7 +264,11 @@ class RestaurantPizzas(Resource):
             db.session.commit()
 
             response = make_response(
-                restaurant_pizza_schema.dump(new_restaurant_pizza),
+                jsonify({
+                    "id":pizza.id,
+                    "name":pizza.name,
+                    "ingredients":pizza.ingredients
+                }),
                 201,
             )
             response.headers["Content-Type"] = "application/json"
