@@ -177,9 +177,14 @@ class RestaurantByID(Resource):
     def delete(self, id):
 
         restaurant = Restaurant.query.filter_by(id=id).first()
+        restaurant_pizzas = RestaurantPizza.query.filter_by(restaurant_id=id).all()
 
         if restaurant :
             db.session.delete(restaurant)
+            
+            for restaurant_pizz in restaurant_pizzas:
+                db.session.delete(restaurant_pizz)
+            
             db.session.commit()
 
             response_dict = {"message": "restaurant successfully deleted"}
@@ -259,21 +264,33 @@ class RestaurantPizzas(Resource):
                 pizza_id=request.json['pizza_id'],
                 restaurant_id=request.json['restaurant_id'],
             )
+            
+            try: 
+                db.session.add(new_restaurant_pizza)
+                db.session.commit()
 
-            db.session.add(new_restaurant_pizza)
-            db.session.commit()
+                response = make_response(
+                    jsonify({
+                        "id":pizza.id,
+                        "name":pizza.name,
+                        "ingredients":pizza.ingredients
+                    }),
+                    201,
+                )
+                response.headers["Content-Type"] = "application/json"
 
-            response = make_response(
-                jsonify({
-                    "id":pizza.id,
-                    "name":pizza.name,
-                    "ingredients":pizza.ingredients
-                }),
-                201,
-            )
-            response.headers["Content-Type"] = "application/json"
+                return response
+            
+            except Exception as e :
+                db.session.rollback()
+                
+                response = make_response(
+                    jsonify({"errors": ["validation errors"]}),
+                    400
+                )
+                response.headers["Content-Type"] = "application/json"
 
-            return response
+                return response
         
         else :
             response = make_response(
